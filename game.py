@@ -1,7 +1,6 @@
 import curses
 from random import randint
 import time
-import threading
 
 
 class Game:
