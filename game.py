@@ -3,7 +3,7 @@ from random import randint
 import math
 
 class Game:
-    def __init__(self, n_row, n_column, pause):
+    def __init__(self, n_row, n_column, pause, id):
         self.food = (2, 5)
         self.end = False
         self.score = 100
@@ -13,8 +13,9 @@ class Game:
         self.snake = []
         self.key = -1
         self.win = ""
-        self.state = [1, 0, 1, 1]
+        self.state = []
         self.win2 = ""
+        self.id = id
 
     def clear(self):
         self.score = 100
@@ -29,7 +30,8 @@ class Game:
         self.snake.append((5, 2))
         self.snake.append((2, 2))
         self.snake.append((6, 2))
-        self.state = [1, 0, 1, 1]
+        self.state = []
+        self.update_state()
 
     def render_init(self):
         curses.initscr()
@@ -50,6 +52,7 @@ class Game:
         self.win2.erase()
         self.win2.border()
         self.win2.addstr(1, 2, str(self.state) + ": " + str(self.key))
+        self.win2.addstr(3, 2, "id: " + str(self.id))
         #self.win2.timeout(self.pause)
 
         self.win.erase()
@@ -134,12 +137,17 @@ class Game:
         if self.snake[0][1] + 1 == self.n_column + 1:
             self.state[3] = 0
 
-        self.state[4], self.state[5] = self.distance_angle_head_apple()
+        a, b = self.distance_angle_head_apple()
+        self.state[4] = a
+        self.state[5] = b
 
 
     def distance_angle_head_apple(self):
-        dist = math.sqrt(self.snake[0][0]**2 - self.food[0]**2) + (self.snake[0][1]**2 - self.food[1]**2)
-        angle = math.atan((self.snake[0][1] - self.food[1]) / (self.snake[0][0] - self.food[0]))
+        dist = math.sqrt((self.snake[0][0] - self.food[0])**2 + (self.snake[0][1] - self.food[1])**2)
+        if (self.snake[0][1] - self.food[1]) == 0:
+            angle = 0
+        else:
+            angle = math.atan((self.snake[0][0] - self.food[0]) / (self.snake[0][1] - self.food[1]))
         return dist, angle
 
     def tick(self):

@@ -2,6 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="b4471f0a-6ec5-4db1-a8b4-592652ae9e9e" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/snakeai.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/snakeai.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/game.py" beforeDir="false" afterPath="$PROJECT_DIR$/game.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
@@ -81,5 +83,31 @@
       </map>
     </option>
     <option name="oldMeFiltersMigrated" value="true" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state width="545" height="483" key="GridCell.Tab.0.bottom" timestamp="1608932169046">
+      <screen x="0" y="0" width="1368" height="872" />
+    </state>
+    <state width="545" height="483" key="GridCell.Tab.0.bottom/0.0.1368.872@0.0.1368.872" timestamp="1608932169046" />
+    <state width="545" height="483" key="GridCell.Tab.0.center" timestamp="1608932169046">
+      <screen x="0" y="0" width="1368" height="872" />
+    </state>
+    <state width="545" height="483" key="GridCell.Tab.0.center/0.0.1368.872@0.0.1368.872" timestamp="1608932169046" />
+    <state width="545" height="483" key="GridCell.Tab.0.left" timestamp="1608932169046">
+      <screen x="0" y="0" width="1368" height="872" />
+    </state>
+    <state width="545" height="483" key="GridCell.Tab.0.left/0.0.1368.872@0.0.1368.872" timestamp="1608932169046" />
+    <state width="545" height="483" key="GridCell.Tab.0.right" timestamp="1608932169046">
+      <screen x="0" y="0" width="1368" height="872" />
+    </state>
+    <state width="545" height="483" key="GridCell.Tab.0.right/0.0.1368.872@0.0.1368.872" timestamp="1608932169046" />
+    <state width="600" height="428" key="javadoc.popup" timestamp="1608932054888">
+      <screen x="0" y="0" width="1368" height="872" />
+    </state>
+    <state width="600" height="428" key="javadoc.popup/0.0.1368.872@0.0.1368.872" timestamp="1608932054888" />
+    <state x="347" y="184" width="672" height="678" key="search.everywhere.popup" timestamp="1608930948043">
+      <screen x="0" y="0" width="1368" height="872" />
+    </state>
+    <state x="347" y="184" width="672" height="678" key="search.everywhere.popup/0.0.1368.872@0.0.1368.872" timestamp="1608930948043" />
   </component>
 </project>
