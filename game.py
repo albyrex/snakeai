@@ -25,11 +25,8 @@ class Game:
         self.snake = []
         self.snake.append((2, 2))
         self.snake.append((3, 2))
-        self.snake.append((2, 2))
         self.snake.append((4, 2))
-        self.snake.append((2, 2))
         self.snake.append((5, 2))
-        self.snake.append((2, 2))
         self.snake.append((6, 2))
         self.state = []
         self.update_state()
@@ -59,7 +56,7 @@ class Game:
         self.win.erase()
         # self.win.timeout(self.pause)
         self.win.border()
-        self.win.addstr(0, 2, 'Score : ' + str(self.score) + ' ')
+        self.win.addstr(0, 2, 'Score : ' + str(self.score) + ' ' + str(len(self.snake)))
         self.win.addstr(self.food[0], self.food[1], "*", curses.color_pair(1))
         for point in self.snake[1:]:
             self.win.addch(point[0], point[1], 'o', curses.color_pair(2))
@@ -136,9 +133,16 @@ class Game:
         if self.snake[0][1] + 1 == self.n_column + 1:
             self.state[3] = 0
 
-        a, b = self.distance_angle_head_apple()
+        #a, b = self.distance_angle_head_apple()
+        a,b = self.distance_v_o()
         self.state[4] = a
         self.state[5] = b
+
+
+
+    def distance_v_o(self):
+        #dist = math.sqrt((self.snake[0][0] - self.food[0]) ** 2 + (self.snake[0][1] - self.food[1]) ** 2)
+        return self.snake[0][0] - self.food[0], self.snake[0][1] - self.food[1]
 
     def distance_angle_head_apple(self):
         dist = math.sqrt((self.snake[0][0] - self.food[0]) ** 2 + (self.snake[0][1] - self.food[1]) ** 2)
@@ -150,31 +154,38 @@ class Game:
 
     def tick(self):
         self.generate_new_head()
+        eaten = False
         if self.snake[0] != self.food:
             self.snake.pop()
             self.score -= 1
         elif self.snake[0] == self.food:
+            eaten = True
+
+        self.update_state()
+
+        if eaten:
             self.food = ()
             self.generate_food()
             self.score += 50
-
-        self.update_state()
 
         collision = self.check_collision()
         if collision or self.score < 0:
             self.gameover()
 
     def simulate_move(self, key):
-        backup_state = self.state
+        backup_state = self.state.copy()
         backup_end = self.end
-        backup_snake = self.snake
+        backup_snake = self.snake.copy()
         backup_food = self.food
         backup_score = self.score
+
+        backup_key = self.key
+
         self.key = key
         self.tick()
-        new_state = self.state
+        new_state = self.state.copy()
         new_end = self.end
-        new_snake = self.snake
+        new_snake = self.snake.copy()
         new_food = self.food
         new_score = self.score
 
@@ -184,6 +195,9 @@ class Game:
         self.food = backup_food
         self.score = backup_score
 
+        self.key = backup_key
+
+        #new_end = False
         return backup_state, new_state, backup_end, new_end, backup_score, new_score
 
     def start(self):

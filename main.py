@@ -3,7 +3,9 @@ from random import randint
 import curses
 import game
 from ai import *
-
+import json
+import pickle
+import math
 
 def get_move(ai, state):
     r = ai.trained_model.predict([state])
@@ -39,8 +41,12 @@ def score_move(old_state, new_state, old_end, new_end, old_snake_score, new_snak
     c = -999999999999999
     b = -1
     a = -4
-    old_score = old_state[4]*a + b + old_end*c
-    new_score = new_state[4]*a + b + new_end*c
+    distance_old = math.sqrt(old_state[4]**2 + old_state[5]**2)
+    distance_new = math.sqrt(new_state[4] ** 2 + new_state[5] ** 2)
+    #old_score = old_state[4]*a + b + old_end*c
+    old_score = distance_old *a + b + old_end*c
+    #new_score = new_state[4]*a + b + new_end*c
+    new_score = distance_new * a + b + new_end * c
     delta_score = new_score - old_score
 
     return delta_score
@@ -59,15 +65,14 @@ def get_move(state=None):
 
 
 def choose_move(arr):
-    score_max = 0
-    right_move = 258
+    score_max = None
     for move in arr.keys():
         score = score_move(arr[move][0],arr[move][1],arr[move][2],arr[move][3],arr[move][4],arr[move][5])
-        if score_max < score:
+        if score_max is None or score_max < score:
             score_max = score
-            right_move = move
+            right_move_ = move
 
-    return right_move
+    return right_move_
 
 
 def decode_move(m):
@@ -80,107 +85,138 @@ def decode_move(m):
     if m == 261:
         return "curses.KEY_RIGHT"
 
+def encode_dataset(m):
+    if m == 258:
+        return -300
+    if m == 259:
+        return -100
+    if m == 260:
+        return +100
+    if m == 261:
+        return +300
+
+def encode_move(m):
+    m = round(m[0])
+    if m == -300:
+        return 258
+    if m == -100:
+        return 259
+    if m == +100:
+        return 260
+    if m == +300:
+        return 261
 
 if __name__ == '__main__':
-
+    """
     dataset = []
     i = 0
-    """
-    while i < 2000:    
-
-        
-        snake_game = game.Game(10, 30, 200, i)
+    speed = 1000
+    while i < 1000:
+        snake_game = game.Game(10, 30, speed, i)
         if snake_game is None:
             print("game is None")
         snake_game.render_init()
-
         snake_game.clear()
+        moves = [258, 259, 260, 261]
+        arr = []
         while snake_game.end is False:
             snake_game.render()
-            state = snake_game.state
-            #key = get_move(ai, state)
-            #key = get_move()
-            key = snake_game.win.getch()
-            snake_game.key = key
+            snake_game.win.refresh()
+            snake_game.win2.refresh()
+            res = dict()
+            for move in moves:
+                res[move] = snake_game.simulate_move(move)
+            right_move = choose_move(res)
+            snake_game.key = right_move
             snake_game.win.refresh()
             snake_game.win2.refresh()
             snake_game.win.timeout(0)
             g = snake_game.win.getch()
             if g == 113:
                 snake_game.gameover()
+            if g == ord("s"):
+                i = 1000
+            if g == ord("v"):
+                speed = int(speed / 10)
+                snake_game.pause = speed
             curses.napms(snake_game.pause)
-            old_state = snake_game.state
-            old_end = snake_game.end
-            old_snake_score = snake_game.score
             snake_game.tick()
-            new_state = snake_game.state
-            new_snake_score = snake_game.score
-            new_end = snake_game.end
-            score_ = score_move(old_state, new_state, new_end, old_end, old_snake_score, new_snake_score)
-            dataset.append((old_state, new_state, new_end, old_end, old_snake_score, new_snake_score, score_, key))
-       
+            snake_game.win.refresh()
+            snake_game.win2.refresh()
+            dataset.append((right_move, res[right_move][0]))
         i += 1
-        
-        
-        
-        """
 
-    snake_game = game.Game(10, 30, 200, 0)
+    curses.endwin()
+    for i in range(len(dataset)):
+        dataset[i] = (encode_dataset(dataset[i][0]), dataset[i][1])
+
+    d = json.dumps(dataset)
+
+    f = open("./dataset.txt", "w+")
+    f.write(d)
+    f.close()
+
+    f = open("./dataset.txt", "r")
+    r = f.read()
+    dataset = json.loads(r)
+    x = []
+    y = []
+    for el in dataset:
+        y.append(el[0])
+        x.append(tuple(el[1]))
+    
+    ai1 = ai(500)
+    ai1.data_segregation(x, y)
+    print("Training...")
+    ai1.train()
+    print("Evaluation...")
+    score = ai1.evaluation()
+    print("Score: " + str(score))
+
+    dump = ai1.save()
+    f = open("./ai.txt", "wb")
+    f.write(dump)
+    """
+    ai2 = ai(500)
+    f = open("./ai.txt", "rb")
+    p = f.read()
+    ai2.load(p)
+    f.close()
+    speed = 1000
+    snake_game = game.Game(10, 30, speed, 0)
     if snake_game is None:
         print("game is None")
     snake_game.render_init()
     snake_game.clear()
-    moves = [258, 259, 260, 261]
-    arr = []
+
+    snake_game.snake = []
+    snake_game.snake.append((2, 8))
+    snake_game.snake.append((3, 8))
+    snake_game.snake.append((4, 8))
+
     while snake_game.end is False:
         snake_game.render()
-        res = dict()
-        for move in moves:
-            res[move] = snake_game.simulate_move(move)
-            print("move: " + str(decode_move(move)))
-        right_move = choose_move(res)
-        print("right_move: " + str(decode_move(right_move)))
-        snake_game.key = right_move
+        snake_game.win.refresh()
+        snake_game.win2.refresh()
+        snake_game.key = (encode_move(ai2.trained_model.predict([tuple(snake_game.state)])))
         snake_game.win.refresh()
         snake_game.win2.refresh()
         snake_game.win.timeout(0)
         g = snake_game.win.getch()
-        if g == 113:
+        if g == ord("q"):
             snake_game.gameover()
+        if g == ord("s"):
+            i = 1000
+        if g == ord("v"):
+            speed = int(speed / 10)
+            snake_game.pause = speed
         curses.napms(snake_game.pause)
         snake_game.tick()
-        dataset.append((right_move, res[right_move]))
+        snake_game.win.refresh()
+        snake_game.win2.refresh()
 
+    curses.napms(5000)
     curses.endwin()
-    """
-    f = open("./dataset.txt", "w+")
-    for i in range(len(dataset)):
-        f.write(str(dataset[i])+"\n")
-    f.close()
-    """
-
-    """
-    f = open("./dataset.txt", "r")
-    content = f.read()
-    #print("Dataset creation...")
-    #x, y = create_dataset(1000)
-    x = content[]
-    ai = ai(500)
-    ai.data_segregation(x, y)
-    #print("Train...")
-    ai.train()
-    #print("Evaluation...")
-    score = ai.evaluation()
-    print("Score: " + str(score))
-    """
-
-
-
-
-
-
-
-
 
 
 
