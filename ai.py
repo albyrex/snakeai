@@ -20,7 +20,7 @@ class ai:
         self.x_train, self.x_test, self.y_train, self.y_test = train_test_split(data, target)
 
     def train(self):
-        self.trained_model = MLPClassifier((20, 10), max_iter=self.epochs, random_state=1).fit(self.x_train, self.y_train)
+        self.trained_model = MLPClassifier((30, 20), max_iter=self.epochs, random_state=1).fit(self.x_train, self.y_train)
 
     def evaluation(self):
         score = self.trained_model.score(self.x_test, self.y_test)

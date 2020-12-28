@@ -197,8 +197,58 @@ class Game:
 
         self.key = backup_key
 
-        #new_end = False
         return backup_state, new_state, backup_end, new_end, backup_score, new_score
+
+    def simulate_move_(self, real_move, moves_):
+        backup_state = self.state.copy()
+        backup_end = self.end
+        backup_snake = self.snake.copy()
+        backup_food = self.food
+        backup_score = self.score
+        backup_key = self.key
+
+        self.key = real_move
+        self.tick()
+        new_state = self.state.copy()
+        new_end = self.end
+        new_snake = self.snake.copy()
+        new_food = self.food
+        new_score = self.score
+        if self.end is True:
+            self.state = backup_state
+            self.end = backup_end
+            self.snake = backup_snake
+            self.food = backup_food
+            self.score = backup_score
+            self.key = backup_key
+            return (backup_state, new_state, backup_end, new_end, backup_score, new_score), new_end
+
+        for list_of_moves in moves_:
+            if self.end is True:
+                break
+            for move in list_of_moves:
+                self.key = move
+                self.false_tick()
+                if self.end is True:
+                    break
+
+        self.state = backup_state
+        self.end = backup_end
+        self.snake = backup_snake
+        self.food = backup_food
+        self.score = backup_score
+        self.key = backup_key
+
+        return (backup_state, new_state, backup_end, new_end, backup_score, new_score), new_end
+
+    def false_tick(self):
+        self.generate_new_head()
+        self.snake.pop()
+        self.score -= 1
+        collision = self.check_collision()
+        if collision or self.score < 0:
+            self.gameover()
+
 
     def start(self):
         self.clear()
